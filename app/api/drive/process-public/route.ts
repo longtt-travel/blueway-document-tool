@@ -1,6 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
+import { requireAuthorizedUser } from "@/lib/authorization";
+
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
@@ -520,6 +522,13 @@ function removeDuplicates(passengers: Passenger[]) {
 }
 
 export async function POST(request: Request) {
+  const authorization =
+    await requireAuthorizedUser();
+
+  if (!authorization.authorized) {
+    return authorization.response;
+  }
+
   try {
     const body = (await request.json()) as {
       folderUrl?: string;

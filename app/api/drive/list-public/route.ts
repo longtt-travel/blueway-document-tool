@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { requireAuthorizedUser } from "@/lib/authorization";
+
 export const runtime = "nodejs";
 
 type DriveFile = {
@@ -93,6 +95,13 @@ function formatDriveError(
 export async function POST(
   request: Request
 ) {
+  const authorization =
+    await requireAuthorizedUser();
+
+  if (!authorization.authorized) {
+    return authorization.response;
+  }
+
   try {
     const body = (await request.json()) as {
       folderUrl?: string;

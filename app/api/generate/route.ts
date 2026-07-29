@@ -1,3 +1,5 @@
+import { requireAuthorizedUser } from "@/lib/authorization";
+
 type GenerateRequest = {
   templateCode?: string;
   outputName?: string;
@@ -16,6 +18,13 @@ type AppsScriptResult = {
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  const authorization =
+    await requireAuthorizedUser();
+
+  if (!authorization.authorized) {
+    return authorization.response;
+  }
+
   try {
     const body = (await request.json()) as GenerateRequest;
 

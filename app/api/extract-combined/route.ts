@@ -1,6 +1,8 @@
 import { GoogleGenAI } from "@google/genai";
 import { NextResponse } from "next/server";
 
+import { requireAuthorizedUser } from "@/lib/authorization";
+
 export const runtime = "nodejs";
 export const maxDuration = 300;
 
@@ -465,6 +467,13 @@ ${sourceText || "Không có text đầu vào"}
 }
 
 export async function POST(request: Request) {
+  const authorization =
+    await requireAuthorizedUser();
+
+  if (!authorization.authorized) {
+    return authorization.response;
+  }
+
   try {
     const formData = await request.formData();
     const templateCodes = parseTemplateCodes(formData);

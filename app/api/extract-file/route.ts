@@ -1,5 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 
+import { requireAuthorizedUser } from "@/lib/authorization";
+
 export const runtime = "nodejs";
 
 const ALLOWED_MIME_TYPES = new Set([
@@ -183,6 +185,13 @@ function extractJsonText(responseText: string) {
 }
 
 export async function POST(request: Request) {
+  const authorization =
+    await requireAuthorizedUser();
+
+  if (!authorization.authorized) {
+    return authorization.response;
+  }
+
   try {
     const formData = await request.formData();
 
